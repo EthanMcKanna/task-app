@@ -14,7 +14,7 @@
                 <div class="col-md-8">
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <h1 class="card-title">Your To-Do List</h1>
+                            <h1 class="card-title text-center">Your To-Do List</h1>
                             <div class="input-group mb-3">
                                 <input type="text" v-model="item" @keyup.enter="addTodo" class="form-control" placeholder="Add new task">
                                 <button @click="addTodo" class="btn btn-success"><i class="bi bi-plus-lg"></i> Add</button>
@@ -31,8 +31,16 @@
                                     <input type="number" @change="setSeconds" class="form-control" style="width: auto;">
                                 </div>
                             </div>
-                            <h2>List:</h2>
-                            <p>Time left: <span :class="{'text-danger': dangerZone}">{{ formattedTime }}</span></p>
+                            <div>
+                                <div class="progress" role="progressbar" aria-label="Time Left" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar progress-bar-animated" 
+                                    :class="{ 'bg-danger': dangerZone }" 
+                                    :style="timeLeftPercentage ? 'width: ' + timeLeftPercentage + '%' : 'width: 0'"> 
+                                   {{ formattedTime }}
+                               </div>
+                                </div>
+                            </div>
+                            <br>
                             <p v-if="timer===0">💥💥💥💥</p>
                             <ul class="list-group">
                                 <li v-for="(i, index) in items" class="list-group-item d-flex justify-content-between align-items-center">
@@ -62,12 +70,18 @@
             },
             computed: {
                 dangerZone() {
-                    return this.timer !== null && this.timer <= 10;
+                    return this.timer !== null && this.timer <= 30;
                 },
                 formattedTime() {
+                    this.timer = this.timer ? Math.round(this.timer) : this.timer;
                     let mins = Math.floor(this.timer / 60);
                     let secs = this.timer % 60;
-                    return `${mins}m ${secs}s`;
+                    mins = mins ? `${mins}m` : "";
+                    secs = secs ? `${secs}s` : "";
+                    return `${mins} ${secs}`;
+                },
+                timeLeftPercentage() {
+                    return (this.timer / (this.timerMins * 60 + this.timerSecs)) * 100;
                 }
             },
             methods: {
